@@ -1,37 +1,56 @@
-# About
+# Scope
 
-![image](https://user-images.githubusercontent.com/2126076/108412562-b3655700-7208-11eb-9c86-d32c50a9f092.png)
+Outline of scope:
 
-This is an example of how to set up a project with:
-
-- Ruby 3
+- Nginx load balancer
+- App server capable of scaling
+- Docker Compose / Dockerfile
+- Postgres DB
 - Rails 6
-- Postgres
-- Puma
-- Nginx
-- Docker
-- Docker compose
+- Twitter Bootstrap 5
 
-# Getting started
+# Setup
 
-To start up the application in your local Docker environment:
+Run the following in your shell to bring up the environment:
 
-1 - Clone the repository
 ```bash
-git clone https://github.com/joaoscotto/docker-ruby-puma-nginx-postgres.git
-cd docker-ruby-puma-nginx-postgres
+docker-compose run app rails db:create
+docker-compose run app yarn add bootstrap jquery popper.js
+docker-compose run app rails webpacker:install
+docker-compose up --build
 ```
 
-2 - Build and start Docker
+You can also scale the containers:
 ```bash
-make build
+docker-compose up --scale app=3
 ```
 
-3 - See the [Makefile](https://github.com/joaoscotto/docker-ruby-puma-nginx-postgres/blob/master/Makefile) for more commands:
+Access the server via:
 ```bash
-make docker
-make clean
-make start
-make bash
-make logs
+127.0.0.1
 ```
+ The load balancer will automatically direct traffic to a round robin set of app servers.
+
+# Issue
+
+When I insert the following code between my ```<head></head>``` tags in app/views/layouts/application.html.erb:
+
+```ruby
+<!-- before -->
+<%= stylesheet_pack_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+<!-- after -->
+
+<%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
+```
+
+The following is what it prints out in the browser:
+
+```html
+<!-- before -->
+
+<!-- after -->
+
+<script src="/packs/js/application-c3ea794f378760157125.js" data-turbolinks-track="reload"></script>
+```
+
+When I click the javascript url, it returns a 404. The stylesheet tag is completely gone. If I switch it to stylesheet_link_tag it prints a stylesheet in the console, but does not style anything either.
