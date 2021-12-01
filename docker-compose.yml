@@ -20,6 +20,11 @@ services:
       - .:/app
     depends_on:
       - postgres
+      - webpack
+    environment:
+      RAILS_ENV: development
+      RACK_ENV: development
+      WEBPACKER_DEV_SERVER_HOST: webpack
   
   nginx:
     build:
@@ -29,3 +34,17 @@ services:
       - app
     ports:
       - 80:80
+
+  webpack:
+    build:
+      context: .
+      dockerfile: webpacker.Dockerfile
+    command: ./bin/webpack-dev-server
+    volumes:
+      - .:/usr/src/app
+    ports:
+      - '3035:3035'
+    environment:
+      NODE_ENV: development
+      RAILS_ENV: development
+      WEBPACKER_DEV_SERVER_HOST: 0.0.0.0

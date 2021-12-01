@@ -6,6 +6,9 @@ RUN apt-get update -qq && apt-get install -qq --no-install-recommends \
     nodejs \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
+
+RUN npm rebuild node-sass
+
 RUN npm install -g yarn@1
 
 WORKDIR /app
